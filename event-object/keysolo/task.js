@@ -14,21 +14,32 @@ class Game {
     this.setNewWord();
     this.winsElement.textContent = 0;
     this.lossElement.textContent = 0;
+    this.isActive = true;
   }
 
   registerEvents() {
-    /*
-      TODO:
-      Написать обработчик события, который откликается
-      на каждый введённый символ.
-      В случае правильного ввода символа вызываем this.success()
-      При неправильном вводе символа - this.fail();
-      DOM-элемент текущего символа находится в свойстве this.currentSymbol.
-     */
+    document.addEventListener('keydown', (event) => {
+    // Игнорируем служебные клавиши
+    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey || 
+        event.key === 'Control' || event.key === 'Shift' || 
+        event.key === 'Alt' || event.key === 'Meta') {
+      return;
+    }
+
+      const currentSymbolElement = this.currentSymbol;
+      const pressedKey = event.key.toLowerCase();
+      const expectedSymbol = currentSymbolElement.textContent.toLowerCase();
+
+      if (pressedKey === expectedSymbol) {
+        this.success();
+      } else {
+        this.fail();
+      }
+    });
   }
 
   success() {
-    if(this.currentSymbol.classList.contains("symbol_current")) this.currentSymbol.classList.remove("symbol_current");
+    this.currentSymbol.classList.remove("symbol_current");
     this.currentSymbol.classList.add('symbol_correct');
     this.currentSymbol = this.currentSymbol.nextElementSibling;
 
@@ -39,14 +50,16 @@ class Game {
 
     if (++this.winsElement.textContent === 10) {
       alert('Победа!');
+      this.isActive = false;
       this.reset();
     }
     this.setNewWord();
   }
 
   fail() {
-    if (++this.lossElement.textContent === 5) {
+    if (++this.lossElement.textContent === 5) { 
       alert('Вы проиграли!');
+      this.isActive = false;
       this.reset();
     }
     this.setNewWord();
@@ -54,7 +67,6 @@ class Game {
 
   setNewWord() {
     const word = this.getWord();
-
     this.renderWord(word);
   }
 
@@ -73,7 +85,6 @@ class Game {
         'javascript'
       ],
       index = Math.floor(Math.random() * words.length);
-
     return words[index];
   }
 
@@ -90,5 +101,4 @@ class Game {
   }
 }
 
-new Game(document.getElementById('game'))
-
+new Game(document.getElementById('game'));
